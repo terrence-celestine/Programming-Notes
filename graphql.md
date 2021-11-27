@@ -104,3 +104,104 @@ const UserType = new GraphQLObjectType({
 });
 ```
 
+### Multiple Root Query Types
+
+1. A graphQL root query can have multiple entry points.
+
+```js
+const RootQuery = new GraphQLObjectType({
+  name: "RootQueryType",
+  fields: {
+    user: {
+      type: UserType,
+      args: { id: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        // go into the data store and return value
+        return axios
+          .get(`http://localhost:3000/users/${args.id}`)
+          .then((res) => res.data);
+      },
+    },
+    company: {
+      type: CompanyType,
+      args: { id: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        return axios
+          .get(`http://localhost:3000/companies/${args.id}`)
+          .then((res) => res.data);
+      },
+    },
+  },
+});
+```
+
+### Two-way relations
+
+1. Queries in graphQL can have nested fields of other object types. A company can have a field called users which has the type of a GraphQLObject. 
+2. Use a list if there are more then 1 object that can be matched to an object.
+
+```js
+const CompanyType = new GraphQLObjectType({
+  name: "Company",
+  fields: {
+    id: { type: GraphQLString },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+    users: {
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args) {
+        return axios
+          .get(`http://localhost:3000/companies/${parentValue.id}/users`)
+          .then((res) => res.data);
+      },
+    },
+  },
+});
+```
+
+### Query Fragments
+
+1. Query fragments are useful when you want to re-use a query in multiple places. You define the fragment by first naming it and passing the type of Object the query should be applied to. GraphQL checks if the fields the fragment's need are apart of the object before returning them.
+
+```js
+{
+  company(id: "1") {
+    ...companyDetails
+  }
+}
+
+fragment companyDetails on Company{
+  id
+  name
+  description
+}
+```
+
+### Mutations
+
+1. Mutations are used to modify data from our data store.
+2. Mutations are a different type of query that takes a field with the name of the mutation, along with data needed to complete the mutation.
+
+```js
+const mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    addUser: {
+      type: UserType, // the type of data we will return from the resolve
+      args: {
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString },
+      },
+      resolve() {},
+    },
+  },
+});
+```
+
+### GraphQLNonNull
+
+1. Can be used to go around a field type. It makes sure that the value passed to a mutation is valid and not empty.
+
+
+

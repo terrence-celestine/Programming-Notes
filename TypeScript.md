@@ -93,3 +93,11 @@ let combineValues = (a:number, b: number) => number;
 
 1. A typesafe version of any. Any value is assignable to it. 
 2. No operations are permitted on an unknown value without doing an if check.
+
+### The Compiler
+
+1. Use the --watch command in the CLI to auto refres whenever a change is made.
+
+2. Use tsc --init will tell the compiler that the entire folder should be managed by typescript.
+   1. Then use tsc --watch to watch any changes in the folder, and reload.
+   2. This will create a tsconfig.json file.
