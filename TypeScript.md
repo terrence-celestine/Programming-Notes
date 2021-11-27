@@ -41,7 +41,13 @@
 
 5. Tuples - An array with a fixed length and list which type of data it contains at each position.
 
-4. Union Types - Let's an argument be different types. 
+6. Union Types - Let's an argument be different types, types can be switched by re-assigning variable.
+
+7. Literal Types - 
+
+8. Type alias/Custom Type - variables that point to core type, union types, or literal types. Can be useful for complex types and make code more readable.
+
+   
 
 ```tsx
 // basic type
@@ -61,5 +67,29 @@ function combine(input1: number | string, input2: number | string){
   }
   return result;
 }
+
+// type alias
+type User = { name: string, age: number};
+const u1: User = { name: "terrence", age: 32};
+
+function greet(user: User){
+  console.log("Hi, i am " + user.name);
+}
 ```
 
+### Return Type: Void
+
+1. A function is void when it returns nothing.
+
+#### Function Type
+
+1. Is a type that describes how the function assigned to a variable's parameters and the return value type's should look.
+
+```ts
+let combineValues = (a:number, b: number) => number;
+```
+
+### Unknown Type
+
+1. A typesafe version of any. Any value is assignable to it. 
+2. No operations are permitted on an unknown value without doing an if check.
