@@ -203,5 +203,53 @@ const mutation = new GraphQLObjectType({
 
 1. Can be used to go around a field type. It makes sure that the value passed to a mutation is valid and not empty.
 
+### Delete Mutation
+
+### Edit Mutation
+
+1. Patch requests only update parts of the object.
+2. Put request updates the entire object.
+3. Args are passed from the query into the patch request.
+
+```js
+// query syntax
+mutation {
+  editUser(id:"23", age: 10){
+    id
+    firstName
+    age
+  }
+}
+// query syntax
+editUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString },
+      },
+      resolve(parentValue, args) {
+        return axios
+          .patch(`http://localhost:3000/users/${args.id}`, args)
+          .then((res) => res.data);
+      },
+}
+```
 
 
+
+### Apollo vs Relay
+
+1. Apollo 
+
+   1.  produced by the same guy as Meteor JS.
+   2. Good balance between features and complexity.
+
+2. Relay
+
+   1. Amazing performance for mobile.
+   2. Insanely complex 
+   3. Used by Facebook
+
+   
