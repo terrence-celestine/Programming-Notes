@@ -232,3 +232,75 @@ class Department {
 }
 ```
 
+### Inheritance
+
+1. Classes can only inherit from one class.
+2. Any class that inherits from another class will inherit it's extended classes properties and methods.
+3. 
+
+```js
+class ITDepartment extends Department {
+    
+}
+```
+
+### Overriding properties & "protected" modifier
+
+1. Classes can override parent functions/properties.
+2. Just add a function of the same name within the class.
+3. Properties with the private keyword aren't shared with inherited classes.
+4. Properties with the protected keyword are shared with any class that extends the base class
+
+```js
+class Department {
+  // private readonly id: string;
+  // private name: string;
+  protected employees: string[] = [];
+
+  constructor(private readonly id: string, public name: string) {
+    // this.id = id;
+    // this.name = n;
+  }
+
+  describe(this: Department) {
+    console.log(`Department (${this.id}): ${this.name}`);
+  }
+
+  addEmployee(employee: string) {
+    // validation etc
+    // this.id = 'd2';
+    this.employees.push(employee);
+  }
+
+  printEmployeeInformation() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+  }
+}
+
+class AccountDepartment extends Department {
+  constructor(id:string, private reports: string[]){
+    super(id,"Accounting");
+  }
+  addEmployee(name: string){    
+    if (name === "Max"){      
+      return;
+    }
+    this.employees.push(name);
+  }
+  addReport(text: string){
+    this.reports.push(text);
+  }
+  printReports(){
+    console.log(this.reports);
+  }
+}
+```
+
+### Getters & Setters
+
+1. A getter method returns the value of the property's value. 
+2. Getter's are sometimes called accessor.
+3. A setter method updates the property's value.
+4. Setters are also known as mutators.
+

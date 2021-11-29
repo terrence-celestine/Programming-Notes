@@ -33,8 +33,6 @@ module.exports = new GraphQLSchema({
 });
 ```
 
-
-
 3. The resolve function within our root query returns a raw javascript object. GraphQL takes the JSON object and only returns the key's that match the fields in the schema. So in the example above we are requesting a user object. If the data we resolve has an other key/values besides id, firstName, and age it will be ignored.
 
 Note: The resolve function uses a Promise to return data to the server.
@@ -56,8 +54,6 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 ```
-
-
 
 4. Schema's tell GraphQL what our data looks like. It's like a blue print.
 
@@ -237,19 +233,223 @@ editUser: {
 }
 ```
 
-
-
 ### Apollo vs Relay
 
 1. Apollo 
 
    1.  produced by the same guy as Meteor JS.
    2. Good balance between features and complexity.
-
 2. Relay
 
    1. Amazing performance for mobile.
    2. Insanely complex 
    3. Used by Facebook
 
-   
+
+### Apollo Client Setup
+
+1. Apollo Store - communicates directly with graphQL server. It's agnostic to the front-end.
+2. Apollo Provider - is a react component and accepts a reference to the datastore.
+
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+import ApolloClient from "apollo-client";
+import { ApolloProvider } from "react-apollo";
+
+const client = new ApolloClient();
+
+const Root = () => {
+  return (
+    <ApolloProvider client={client}>
+      <div>Lyrical</div>
+    </ApolloProvider>
+  );
+};
+```
+
+### Getting data from graphQL to React
+
+1. Identify data required
+2. Write query in GraphiQL and in component file.
+3. Bond query + component
+4. Access data.
+
+Notes: graphql-tag allows you to write a graphQL query using back ticks.
+
+To pass the data from graphQL to a component use react-apollo and export graphql and the component
+
+```jsx
+import React, { Component } from "react";
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+
+class SongList extends Component {
+  render() {
+    console.log(this.props);
+    return <div>this is the song list</div>;
+  }
+}
+
+const query = gql`
+  {
+    songs {
+      id
+      title
+      lyrics {
+        content
+      }
+    }
+  }
+`;
+
+export default graphql(query)(SongList);
+```
+
+5. Trying to get data before it loads throws an error in react.
+   1. Use the "props.loading" boolean to check if graphQL returned the data before rendering.
+
+```jsx
+import React, { Component } from "react";
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+
+class SongList extends Component {
+  renderSongs() {
+    return this.props.data.songs.map((song) => {
+      return <li>{song.title}</li>;
+    });
+  }
+  render() {
+    if (this.props.data.loading) {
+      return <div>Loading</div>;
+    }
+    return <div>{this.renderSongs()}</div>;
+  }
+}
+
+const query = gql`
+  {
+    songs {
+      title
+    }
+  }
+`;
+
+export default graphql(query)(SongList);
+
+```
+
+### Mutations in GraphQL
+
+1. Mutations look like functions and take query parameters.
+
+```js
+mutation AddSong($title: String){
+    addSong(title: $title){
+        id
+        title
+    }
+}
+```
+
+### Mutations in React
+
+1. When we wrap a mutation on a component it gives the component access to "props.mutate"
+   1. this.props.mutate invokes the mutation wrapped on the component when it was exported.
+
+```js
+import _ from "lodash";
+import React, { Component } from "react";
+import gql from "graphql-tag";
+
+const mutation = gql`
+  mutation AddSong($title: String) {
+    addSong(title: $title) {
+      title
+    }
+  }
+`;
+
+class SongCreate extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "",
+    };
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+    console.log("submitting");
+    this.props.mutate({
+      variables: {
+        title: this.state.title,
+      },
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Create a New Song</h3>
+        <form onSubmit={this.onSubmit.bind(this)}>
+          <label>Song title:</label>
+          <input
+            type="text"
+            onChange={(e) => this.setState({ title: e.target.value })}
+            value={this.state.title}
+          />
+        </form>
+      </div>
+    );
+  }
+}
+
+export default graphql(mutation)(SongCreate);
+```
+
+### Refetching data 
+
+1. If a component uses a graphql query to fetch data, sometimes apollo client will not re-run the query after doing a mutation.
+2. To fix this, the mutate function takes a "refetchQueries" argument, this is an array of query objects that can also take variables.
+
+```jsx
+  onSubmit(e) {
+    e.preventDefault();
+    this.props
+      .mutate({
+        variables: {
+          title: this.state.title,
+        },
+        refetchQueries: [{ query: query }],
+      })
+      .then(() => hashHistory.push("/"))
+      .catch((err) => console.log(err));
+  }
+```
+
+3. The mutate function also has access to "props.data.refetch", this will re-run any queries tied to the component.
+
+```jsx
+  onSongDelete(id) {
+    this.props
+      .mutate({
+        variables: {
+          id: id,
+        },
+      })
+      .then(() => this.props.data.refetch());
+  }
+```
+
+4. Queries that are bound to a component can receive props using the options key and passing the varialbes that the query needs.
+
+```js
+export default graphql(query, {
+  options: (props) => {
+    return { variables: { id: props.params.id } };
+  },
+})(SongDetail);
+```
+
