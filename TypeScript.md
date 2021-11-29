@@ -304,3 +304,58 @@ class AccountDepartment extends Department {
 3. A setter method updates the property's value.
 4. Setters are also known as mutators.
 
+### Static Properties
+
+1. Cannot be accessed from inside the instance.
+2. To access static props and functions use the class name
+
+```ts
+class Department {
+    static fiscalYear = 2020;
+    protected employees: string[] = [];
+    constructor(private readonly id:string, public name: string){
+
+    }
+    describe = () => {
+        console.log("Department: " + this.name)
+        console.log(Department.fiscalYear);
+    }
+    addEmployee = (employee:string) => {
+        this.employees.push(employee);
+    }
+    printEmployeeInformation = () => {
+        console.log(this.employees.length);
+        console.log(this.employees)
+    }
+    static createEmployee = (name: string) => {
+        return {name:name};
+    }
+}
+```
+
+### Abstract Classes
+
+1. Used if a class inherits a function and that function needs to be defined by the inheriting class.
+2. Create a function inside of the parent class but leave it empty.
+3. Define a seperate function within the child class with the "this" keyword referencing the parent class, and a return type of "void".
+4. Abstract classes force the child classes to have a specific function.
+5. Abstracted classes cannot be instantiated. (We cannot create objects from them)
+
+```tsx	
+// Parent class
+abstract class Department {
+    static fiscalYear = 2020;
+    protected employees: string[] = [];
+    constructor(protected readonly id:string, public name: string){
+
+    }
+    abstract describe(this:Department): void;
+}
+// Child class
+
+```
+
+### Singletons & Private Constructors
+
+1. Singleton Pattern - allows for there to be only have one instance of a class.
+2. 
