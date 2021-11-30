@@ -77,7 +77,210 @@ class Welcome extends React.Component {
 
 
 
+### Composing Components
+
+1. High level components can have multiple smaller components.
+
+```jsx
+function Welcome(props){
+  return <h1>Hello, {props.name}</h1>
+}
+
+function App(){
+  return (
+  	<div>
+    	<Welcome name="Sara"/>
+      <Welcome name="Kyle"/>
+      <Welcome name="Tommy"/>
+    </div>
+  )
+}
+
+ReactDOM.render(
+  <App/>,
+  document.getElementById('root')
+)
+```
 
 
 
+### Extracting components
+
+1. Components that are made up of a bunch of different HTML elements should be split into smaller components.
+2. This lets you build seperate smaller components that are re-usable.
+
+```jsx
+function Comment(props) {
+  return (
+    <div className="Comment">
+      <UserInfo user={props.author} />
+      <div className="Comment-text">
+        {props.text}
+      </div>
+      <div className="Comment-date">
+        {formatDate(props.date)}
+      </div>
+    </div>
+  );
+}
+
+function UserInfo(props) {
+  return (
+    <div className="UserInfo">
+      <Avatar user={props.user} />
+      <div className="UserInfo-name">
+        {props.user.name}
+      </div>
+    </div>
+  );
+}
+
+function Avatar(props) {
+  return (
+    <img className="Avatar"
+      src={props.user.avatarUrl}
+      alt={props.user.name}
+    />
+  );
+}
+```
+
+### Props are Read-Only
+
+- When you make a component (function or class) it must never modify it's own props.
+
+### Component State
+
+- State can be added to a function component using hooks - useState, useEffect
+- State can be added to a class component using the constructor
+
+```jsx
+class Clock extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {data: new Date()}
+  }
+  render() {
+    return (
+      <div>
+        <h1>Hello, World</h1>
+        <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+      </div>
+    )
+  }
+}
+```
+
+### Lifecycle Methods
+
+- Helps to free up resources when components are destroyed.
+- Used within class based components.
+- componentDidMount - runs after the component renders to the DOM.
+- componentWillUnmount - runs before the component is removed from the DOM.
+
+```jsx
+class Clock extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {date: new Date()}
+  }
+  
+  componentDidMount(){
+    this.timerID = setInterval(() => this.tick(), 1000)
+  }
+  componentWillUnmount(){
+    clearInterval(this.timerID)
+  }
+  
+  tick() {
+    this.setState({
+      date: new Date()
+    });
+  }
+  
+  render(){
+    return (
+    	<div>
+      	<h1>Hello, world</h1>
+        <h2>Is is {this.state.date.toLocaleTimeString()}</h2>
+      </div>
+    )
+  }
+}
+```
+
+### State
+
+- A components state should not be modified directly.
+- Use the setState function to update the state.
+- setState accepts a function that receives the previous state and the props.
+- calling setState takes the current state and merges it with the new values passed to it, any values not updated will persist.
+
+```jsx
+this.setState({comment: "Hello"});
+
+this.setState((state,props) => ({
+  counter: state.counter + props.increment
+}));
+
+componentDidMount() {
+  // only posts is updated in this call, comments stays the same
+  fetchPosts().then(response => {
+    this.setState({
+      posts: response.posts 
+    })
+  });
+  // only comments is updated, posts stay the same
+  fetchPosts().then(response => {
+    this.setStat({
+      comments: response.comments
+    });
+  });
+}
+```
+
+### Handling Events
+
+- events are named in camelCase e.g.
+  - class -> className
+  - onclick -> onClick
+  - to prevent the default behavior of a element you need to pass the event to the function and call preventDefault.
+  - to pass arguments to an event handler 
+
+```jsx
+function Form(){
+  function handleSubmit(e){
+    e.preventDefault();
+    console.log('you clicked submit');
+  }
+  return (
+    <form onSubmit={handleSubmit}>
+      <button type="submit">Submit</button>
+    </form> 
+  )
+}
+```
+
+```jsx
+class LoggingButton extends React.Component {
+  handleClick = () => {
+    console.log('clicked');
+  }
+  render(){
+    return (
+      <button onClick={this.handleClick}>
+        Click me
+      </button>
+    )
+  }
+}
+```
+
+```jsx
+<button onClick={(e) => this.deleteRow(e,id)}>Delete Row</button>
+```
+
+### Conditional Rendering
+
+- 
 
