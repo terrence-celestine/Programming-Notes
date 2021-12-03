@@ -514,3 +514,24 @@ class Reservation extends React.Component {
 
 - Parent components should be the source of truth for child components.
 - Parent components should also pass a function to child components so the parent's state can be updated on change.
+
+```jsx
+class SelectStarter extends React.Component {
+  constructor(props){
+    super(props);
+    this.handleNameChange = this.handleNameChange.bind(this);
+  	this.state = {starter_pokemon: ""}
+  }
+  handlePokemonChange(name){
+    this.setState({starter_pokemon: name })
+  }
+  render(){
+    return (
+    	<SelectPokemonDropDown selectPokemonCallback={this.handlePokemonChange}/>
+    )
+  }
+}
+```
+
+
+
