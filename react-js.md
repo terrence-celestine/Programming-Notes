@@ -1,4 +1,15 @@
-# What is JSX?
+# React Notes
+
+## General Best Practices
+
+1. The order of your component should be like this
+   1. Interface for component props
+   2. useState
+   3. const for function/handlers
+   4. useEffect
+   5. return statements
+
+## What is JSX?
 
 1. JSX is a mixture of javascript and html.
 2. Elements in JS can be wrapped in curly braces inside of HTML.
@@ -23,25 +34,27 @@ ReactDOM.render(
 3. JSX can use curly braces within the HTML to pass variables to attributes.
 
 ```jsx
-const element = <img src={user.avatarUrl}></img>
+const Avatar = <img src={user.avatarUrl}></img>;
 ```
 
 4. If a tag is empty you can immediately close it with a self closing tag.
 
 ```jsx	
-const element = <img src={user.avatarUrl} />;
+const Avatar = <img src={user.avatarUrl} />;
 ```
 
 5. JSX can have children elements.
 
 ```jsx
-const element = (
+const GreetUser = (
   <div>
     <h1>Hello!</h1>
     <h2>Good to see you here.</h2>
   </div>
 );
 ```
+
+
 
 # Rendering Elements
 
@@ -58,6 +71,8 @@ const element = (
 const element = <h1>Hello, world</h1>;
 ReactDOM.render(element, document.getElementById('root'));
 ```
+
+# NEED TO REWRITE BELOW
 
 # Function and Class Components
 
