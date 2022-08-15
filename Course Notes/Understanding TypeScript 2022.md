@@ -94,6 +94,16 @@ let combineValues = (a:number, b: number) => number;
 1. A typesafe version of any. Any value is assignable to it. 
 2. No operations are permitted on an unknown value without doing an if check.
 
+### Never Type
+
+1. Can be used as a return type from a function that throws an error.
+
+```tsx
+const generateError(message: stirng, code: number): never {
+    throw { message: message, errorCode: code};
+}
+```
+
 ### The Compiler
 
 1. Use the --watch command in the CLI to auto refres whenever a change is made.
@@ -148,6 +158,8 @@ let combineValues = (a:number, b: number) => number;
 ### Classes
 
 1. Classes are like blue prints for an object. 
+   1. You can define the key/value pairs for the attributes of the object.
+
 2. Classes have a constructor function that takes the arguments passed to the function and sets them on the object instance.
 
 ```js
@@ -161,201 +173,218 @@ class Department {
   }
 }
 
-const accounting = new Department('Accounting');
+const accounting = new Department('Accounting'); // returns {name: "Accounting"}
 
 ```
 
-### This Keyword
+### Class Methods 
 
-1. The "this" keyword is used for referencing the class instance.
-2. Use arrow functions to scope the "this" keyword.
+1. Can be accessed by new instances of the class.
+2. The "this" keyword refers to the specific instance of the class.
 
-```js
-class Department{
-  name: string
-  constructor(n: string){
-    this.name = n;
-  }
-  describe = () => {
-    console.log("Department" + this.name)
-  }
-}
-```
-
-### Public/Private Keyword
-
-1. Adding the private keyword infront of a class property makes it so the property can only be accessed by the class.
-2. Use private keyword to protect any data that shouldn't be modified unless.
-3. Properties and methods are considered "public" by default.
-
-```js
+```tsx
 class Department {
-    public name: string;
-    private employees: string[] = [];
-    constructor(n:string){
+    name: string;
+    constructor (n: string){
         this.name = n;
     }
-    describe = () => {
-        console.log("Department: " + this.name)
-    }
-    addEmployee = (employee:string) => {
-        this.employees.push(employee);
-    }
-    printEmployeeInformation = () => {
-        console.log(this.employees.length);
-        console.log(this.employees)
+    describe(){
+        console.log("Department " + this.name);
     }
 }
 ```
 
-### Read Only Keyword
+### Public & Private Keyword
 
-1. Useful for when you create an object with immutable props.
+1. Useful for making a class property only accessible by the instance of the class. Any data cannot be directly accessed.
 
-```js
+```tsx
 class Department {
-  readonly name: string;
-	private employees: string[] = [];
-  constructor(n:string){
+  name: string;
+  private employees: string[] = [];
+  constructor(n: string) {
     this.name = n;
   }
-  describe = () => {
+  describe(this: Department) {
     console.log("Department" + this.name);
   }
-  addEmployee = (employee:string) => {
-    this.employees.spush(employee);
-  }
-  printEmploeeInformation = () => {
-    console.log(this.employees.length);
-    console.log(this.employees);
-  }
-}
-```
-
-### Inheritance
-
-1. Classes can only inherit from one class.
-2. Any class that inherits from another class will inherit it's extended classes properties and methods.
-3. 
-
-```js
-class ITDepartment extends Department {
-    
-}
-```
-
-### Overriding properties & "protected" modifier
-
-1. Classes can override parent functions/properties.
-2. Just add a function of the same name within the class.
-3. Properties with the private keyword aren't shared with inherited classes.
-4. Properties with the protected keyword are shared with any class that extends the base class
-
-```js
-class Department {
-  // private readonly id: string;
-  // private name: string;
-  protected employees: string[] = [];
-
-  constructor(private readonly id: string, public name: string) {
-    // this.id = id;
-    // this.name = n;
-  }
-
-  describe(this: Department) {
-    console.log(`Department (${this.id}): ${this.name}`);
-  }
-
   addEmployee(employee: string) {
-    // validation etc
-    // this.id = 'd2';
     this.employees.push(employee);
   }
-
   printEmployeeInformation() {
     console.log(this.employees.length);
     console.log(this.employees);
   }
 }
 
-class AccountDepartment extends Department {
-  constructor(id:string, private reports: string[]){
-    super(id,"Accounting");
+const accounting = new Department("Accounting");
+
+accounting.describe();
+
+accounting.addEmployee("Terrence");
+accounting.addEmployee("Justin");
+accounting.printEmployeeInformation();
+
+```
+
+### Inheritance
+
+1. Classes can inherit from another class using "extends".
+2. use "super()" to override the constructor of the base class.
+
+```ts
+class Department {
+  private employees: string[] = [];
+  constructor(private id: string, public name: string) {
+    this.name = name;
+    this.id = id;
   }
-  addEmployee(name: string){    
-    if (name === "Max"){      
-      return;
-    }
-    this.employees.push(name);
+  describe(this: Department) {
+    console.log("Department" + this.name);
   }
-  addReport(text: string){
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
+  printEmployeeInformation() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+  }
+}
+
+class ITDepartment extends Department {
+  admins: string[];
+  constructor(id: string, admins: string[]) {
+    super(id, ": IT");
+    this.admins = admins;
+  }
+}
+
+class AccountingDepartment extends Department {
+  constructor(id: string, private reports: string[]) {
+    super(id, "Accounting");
+  }
+  addReport(text: string) {
     this.reports.push(text);
   }
-  printReports(){
+  printReports() {
     console.log(this.reports);
   }
 }
 ```
 
-### Getters & Setters
+### Overriding properties and "protected" keyword.
 
-1. A getter method returns the value of the property's value. 
-2. Getter's are sometimes called accessor.
-3. A setter method updates the property's value.
-4. Setters are also known as mutators.
-
-### Static Properties
-
-1. Cannot be accessed from inside the instance.
-2. To access static props and functions use the class name
+1. "protected" keyword is like private.
+2. "protected" properties are accessible within any class extends from the base class.
 
 ```ts
 class Department {
-    static fiscalYear = 2020;
-    protected employees: string[] = [];
-    constructor(private readonly id:string, public name: string){
-
-    }
-    describe = () => {
-        console.log("Department: " + this.name)
-        console.log(Department.fiscalYear);
-    }
-    addEmployee = (employee:string) => {
-        this.employees.push(employee);
-    }
-    printEmployeeInformation = () => {
-        console.log(this.employees.length);
-        console.log(this.employees)
-    }
-    static createEmployee = (name: string) => {
-        return {name:name};
-    }
+  protected employees: string[] = [];
+  constructor(private id: string, public name: string) {
+    this.name = name;
+    this.id = id;
+  }
+  describe(this: Department) {
+    console.log("Department" + this.name);
+  }
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
+  printEmployeeInformation() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+  }
 }
+
+class AccountingDepartment extends Department {
+  constructor(id: string, private reports: string[]) {
+    super(id, "Accounting");
+  }
+  addReport(text: string) {
+    this.reports.push(text);
+  }
+  printReports() {
+    console.log(this.reports);
+  }
+}
+
+const accounting = new AccountingDepartment("d2", []);
+accounting.addEmployee("Peter");
+accounting.printEmployeeInformation(); // returns ["Peter"]
 ```
 
-### Abstract Classes
+### Getters
 
-1. Used if a class inherits a function and that function needs to be defined by the inheriting class.
-2. Create a function inside of the parent class but leave it empty.
-3. Define a seperate function within the child class with the "this" keyword referencing the parent class, and a return type of "void".
-4. Abstract classes force the child classes to have a specific function.
-5. Abstracted classes cannot be instantiated. (We cannot create objects from them)
+1. "Getters" are a property that runs a private method.
 
-```tsx	
-// Parent class
-abstract class Department {
-    static fiscalYear = 2020;
-    protected employees: string[] = [];
-    constructor(protected readonly id:string, public name: string){
+```tsx
+class AccountingDepartment extends Department {
+  private lastReport: string;
 
+  get mostRecentReport() {
+    if (this.lastReport) {
+      return this.lastReport;
     }
-    abstract describe(this:Department): void;
-}
-// Child class
+    throw new Error("No report found");
+  }
 
+  constructor(id: string, private reports: string[]) {
+    super(id, "Accounting");
+    this.lastReport = reports[0];
+  }
+  addReport(text: string) {
+    this.reports.push(text);
+    this.lastReport = text;
+  }
+  printReports() {
+    console.log(this.reports);
+  }
+}
+
+const accounting = new AccountingDepartment("d2", [])
+console.log(accounting.mostRecentReport);
 ```
 
-### Singletons & Private Constructors
+### Setters
 
-1. Singleton Pattern - allows for there to be only have one instance of a class.
-2. 
+1. Update a private property  of a class.
+
+```tsx
+class AccountingDepartment extends Department {
+  private lastReport: string;
+
+  get mostRecentReport() {
+    if (this.lastReport) {
+      return this.lastReport;
+    }
+    throw new Error("No report found");
+  }
+
+  set mostRecentReport(value: string) {
+    if (!value) {
+      throw new Error("Please pass in a valid value");
+    }
+    this.addReport(value);
+  }
+
+  constructor(id: string, private reports: string[]) {
+    super(id, "Accounting");
+    this.lastReport = reports[0];
+  }
+  addReport(text: string) {
+    this.reports.push(text);
+    this.lastReport = text;
+  }
+  printReports() {
+    console.log(this.reports);
+  }
+}
+
+const accounting = new AccountingDepartment("d2", []);
+accounting.mostRecentReport = "Year End Report";
+```
+
+### Static Methods and Properties
+
+1. Static properties or methods can be accessed directly on the class without a function call.
+
